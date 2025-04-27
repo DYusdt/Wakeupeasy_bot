@@ -21,7 +21,10 @@ def handle_message(message):
                 wake_time = sleep_start + datetime.timedelta(minutes=cycles * cycle_minutes)
                 recommendations.append(f"{cycles} цикл(ов): {wake_time.strftime('%H:%M')}")
 
-            bot.reply_to(message, "Лучшие времена для пробуждения:")
+            try:
+    bot.reply_to(message, "Лучшие времена для пробуждения:\n" + "\n".join(рекомендации))
+except Exception as e:
+    print(f"Произошла ошибка при отправке сообщения: {e}")
 " + "\n".join(recommendations))
         except Exception as e:
             bot.reply_to(message, "Не могу разобрать время. Напиши, например: 'Я ложусь в 23:40'")
