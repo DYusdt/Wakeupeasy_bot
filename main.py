@@ -1,34 +1,32 @@
-
 import telebot
 
-TOKEN = '7697075490:AAFhAiwUQiVKYaRNh36daSJWgJBZ-9O-_t0'
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot('7697075490:AAFhAiwUQiVKYaRNh36daSJWgJBZ-9O-_t0')
+
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, "Привет! Отправь мне время, во сколько ты ложишься спать (например: 23:00).")
 
 @bot.message_handler(func=lambda message: True)
-def handle_message(message):
-    import datetime
+def calculate_sleep_cycles(message):
+    try:
+        import datetime
 
-    text = message.text.lower()
-    if "ложусь в" in text:
-        try:
-            time_text = text.split("ложусь в")[1].strip()
-            hour, minute = map(int, time_text.split(":"))
-            sleep_start = datetime.datetime.now().replace(hour=hour, minute=minute, second=0, microsecond=0)
-            
-            cycle_minutes = 90
-            recommendations = []
-            for cycles in range(3, 7):
-                wake_time = sleep_start + datetime.timedelta(minutes=cycles * cycle_minutes)
-                recommendations.append(f"{cycles} цикл(ов): {wake_time.strftime('%H:%M')}")
+        sleep_time = message.text.strip()
+        sleep_hour, sleep_minute = map(int, sleep_time.split(':'))
+        sleep_datetime = datetime.datetime.now().replace(hour=sleep_hour, minute=sleep_minute, second=0, microsecond=0)
 
-            try:
-    bot.reply_to(message, "Лучшие времена для пробуждения:\n" + "\n".join(рекомендации))
-except Exception as e:
-    print(f"Произошла ошибка при отправке сообщения: {e}")
-" + "\n".join(recommendations))
-        except Exception as e:
-            bot.reply_to(message, "Не могу разобрать время. Напиши, например: 'Я ложусь в 23:40'")
-    else:
-        bot.reply_to(message, "Напиши, во сколько ты ложишься спать, например: 'Я ложусь в 23:40'")
+        cycle_minutes = 90
+        recommendations = []
 
-bot.polling()
+        for cycles in range(3, 7):
+            wake_up_time = sleep_datetime + datetime.timedelta(minutes=cycle_minutes * cycles)
+            recommendations.append(wake_up_time.strftime("%H:%M"))
+
+        bot.reply_to(
+            message,
+            "Лучшие времена для пробуждения:\n" + "\n".join(recommendations)
+        )
+    except Exception as e:
+        bot.reply_to(message, "Произошла ошибка. Пожалуйста, отправь время в формате ЧЧ:ММ.")
+
+bot.infinity_polling()
