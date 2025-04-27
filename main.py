@@ -22,7 +22,6 @@ def handle_message(message):
                 recommendations.append(f"{cycles} цикл(ов): {wake_time.strftime('%H:%M')}")
 
             bot.reply_to(message, "Лучшие времена для пробуждения:")
-        
 " + "\n".join(recommendations))
         except Exception as e:
             bot.reply_to(message, "Не могу разобрать время. Напиши, например: 'Я ложусь в 23:40'")
